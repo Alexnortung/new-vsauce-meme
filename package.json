@@ -1,0 +1,17 @@
+{
+  "name": "new-vsauce-meme",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Alexander Nortung",
+  "license": "ISC",
+  "dependencies": {
+    "lupus": "0.0.1",
+    "node-schedule": "^1.2.1",
+    "read-file": "^0.2.0",
+    "sqlite3": "^3.1.8"
+  }
+}
