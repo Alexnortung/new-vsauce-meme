@@ -43,18 +43,20 @@ function postToFacebook(PageUA) {
 
 	var message = "";
 
-	db.all("SELECT * FROM messages LIMIT 1", function(err, messageRows){
-		if (messageRows.length != 0) {
-			message = messageRows[0].message;
-			db.run("DELETE FROM messages WHERE id = (?)", messageRows[0].id );
-		}
+	try{
 
-		//post to facebook
+		db.all("SELECT * FROM messages LIMIT 1", function(err, messageRows){
+			if (messageRows.length != 0) {
+				message = messageRows[0].message;
+				db.run("DELETE FROM messages WHERE id = (?)", messageRows[0].id );
+			}
 
-		var imageUrl = defURL + filename;
+			//post to facebook
 
-		if (!debug) {
-			var post_options = {
+			var imageUrl = defURL + filename;
+
+			if (!debug) {
+				var post_options = {
 				    host: 'graph.facebook.com',
 				    path: '/'+ albumID +'/photos?url='+ imageUrl
 				    +'&message=' + encodeURI(message)
@@ -63,32 +65,43 @@ function postToFacebook(PageUA) {
 				      
 				};
 
-				var post_req = http.request(post_options, function(res) {
-			    	res.setEncoding('utf8');
-			    	res.on('data', function (chunk) {
-			        	console.log('Response: ' + chunk);
+				try {
+
+					var post_req = http.request(post_options, function(res) {
+				    	res.setEncoding('utf8');
+				    	res.on('data', function (chunk) {
+				        	console.log('Response: ' + chunk);
+						});
 					});
-				});
 
-					  // post the data
-					  
-			post_req.end();
-		} else {
-			console.log(imageUrl);
-			console.log(fileIndex);
-			console.log(file);
-			console.log(newPath);
-		}
+							  // post the data
+							  
+					post_req.end();
+
+				} catch(tryErr){
+					console.log(tryErr);
+				}
+			} else {
+				console.log(imageUrl);
+				console.log(fileIndex);
+				console.log(file);
+				console.log(newPath);
+			}
 
 
-	});	
+		});	
+	} catch(tryErr2){
+		console.log(tryErr2);
+	}
 
 }
 
-var postSchedule = schedule.scheduleJob("0 0 */4 * * *", function(){
-	postToFacebook(read.sync("./PageToken"));
-});
+var postSchedule;
 
 if (debug) {
 	postToFacebook(read.sync("./PageToken"));
-}
+} else {
+	postSchedule = schedule.scheduleJob("0 0 */4 * * *", function(){
+		postToFacebook(read.sync("./PageToken"));
+	});
+} 
